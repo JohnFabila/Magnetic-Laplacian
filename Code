@@ -1,0 +1,48 @@
+(*Program to compute the Magnetic Laplacian Matrix and the Spectrum, \
+ the input is:
+ G=Set of pair of vertex represent the edges {e=(i,j)};
+ Alpha=Vector Potential on the edges;
+ wE=Weight on Edges, if wE=0 or 1 the standart weight;
+ wV=Weight on Vertex, if wV=0 or 1 the standart vertex weight;  
+ EXAMPLE:
+ A={{1,2},{2,3},{4,1},{2,5},{5,4},{6,5},{6,3},{1,1},{6,3},{1,1},{2,2}};\
+ 
+ B=Table[Subscript[\[Alpha],Subscript["e",i]],{i,11}];
+ EdW={me1,me2,me3,me4,me5,me6,me7,me8,me9,me10,me11};VeW={mv1,mv2,mv3,\
+ mv4,mv5,mv9};MagLap[A,B,EdW,VeW][[{1,2}]] 
+ *)
+ MagLap[G_, Alpha_, wE_, wV_] := (
+   n = Max[G];(*number of vertices*)
+   
+   L = ConstantArray[0, {n, n}];(*Define the Laplacian matrix as zero*)
+ 
+     m = Dimensions[G][[1]];(*numver of edges*)
+   
+   deg = Table[
+     Count[G, i, 2], {i, n}] ; (*degree vector of the vertices*)
+   
+   mE = If[NumberQ[wE], ConstantArray[1, {m}], 
+     wE];(*standart weight if wE=0 or wE=1*)
+   
+   mV = If[NumberQ[wV], deg, wV];(*standart weight if wV=0 or wV=1*)
+   
+   For [i = 1, i <= m, i++,
+    j = G[[i, 1]];
+    k = G[[i, 2]];
+    L[[j, k]] = -(mE[[i]])*
+       E^(-I*Alpha[[i]])/(Sqrt[mV[[j]]]*Sqrt[mV[[k]]]) + L[[j, k]]; 
+    L[[k, j]] = -(mE[[i]])*
+       E^(I*Alpha[[i]])/(Sqrt[mV[[j]]]*Sqrt[mV[[k]]]) + L[[k, j]];
+    L[[j, j]] = mE[[i]]/mV[[j]] + L[[j, j]] ;
+    L[[k, k]] = mE[[i]]/mV[[k]] + L[[k, k]]
+    ];(*compute the laplacian*)
+   
+   Gra = Graph[
+     Table[Table[G[[j]][[1]], {j, 1, m}][[k]] -> 
+       Table[G[[j]][[2]], {j, 1, m}][[k]], {k, 1, m}], 
+     VertexLabels -> 
+      Table[i -> Subscript[v, i], {i, 
+        n}]];(*define grpah draw*)
+   {Gra, L // MatrixForm, 
+    Eigenvalues[L],}(*output: graph,matrix and eigenvalues*)
+   )
