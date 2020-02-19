@@ -21,28 +21,5 @@
    deg = Table[
      Count[G, i, 2], {i, n}] ; (*degree vector of the vertices*)
    
-   mE = If[NumberQ[wE], ConstantArray[1, {m}], 
-     wE];(*standart weight if wE=0 or wE=1*)
-   
-   mV = If[NumberQ[wV], deg, wV];(*standart weight if wV=0 or wV=1*)
-   
-   For [i = 1, i <= m, i++,
-    j = G[[i, 1]];
-    k = G[[i, 2]];
-    L[[j, k]] = -(mE[[i]])*
-       E^(-I*Alpha[[i]])/(Sqrt[mV[[j]]]*Sqrt[mV[[k]]]) + L[[j, k]]; 
-    L[[k, j]] = -(mE[[i]])*
-       E^(I*Alpha[[i]])/(Sqrt[mV[[j]]]*Sqrt[mV[[k]]]) + L[[k, j]];
-    L[[j, j]] = mE[[i]]/mV[[j]] + L[[j, j]] ;
-    L[[k, k]] = mE[[i]]/mV[[k]] + L[[k, k]]
-    ];(*compute the laplacian*)
-   
-   Gra = Graph[
-     Table[Table[G[[j]][[1]], {j, 1, m}][[k]] -> 
-       Table[G[[j]][[2]], {j, 1, m}][[k]], {k, 1, m}], 
-     VertexLabels -> 
-      Table[i -> Subscript[v, i], {i, 
-        n}]];(*define grpah draw*)
-   {Gra, L // MatrixForm, 
-    Eigenvalues[L],}(*output: graph,matrix and eigenvalues*)
-   )
+
+
